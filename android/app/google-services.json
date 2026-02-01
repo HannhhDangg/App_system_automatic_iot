@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "103313973482",
+    "firebase_url": "https://smarthomedoorlock-e9b6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smarthomedoorlock-e9b6d",
+    "storage_bucket": "smarthomedoorlock-e9b6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103313973482:android:ec4e05cde25847d0817793",
+        "android_client_info": {
+          "package_name": "com.example.smart_door_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKq2Sw0wOoqArPZROa2gnPSXIJ2u6WUIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
