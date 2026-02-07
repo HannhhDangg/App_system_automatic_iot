@@ -31,7 +31,7 @@ class _HistoryPageState extends State<HistoryPage> {
             
             // 1. Sắp xếp: Mới nhất lên trên đầu
             List<MapEntry<dynamic, dynamic>> allLogs = data.entries.toList()
-              ..sort((a, b) => (b.value['timestamp'] ?? '').compareTo(a.value['timestamp'] ?? ''));
+  ..sort((a, b) => (b.value['timestamp'] ?? '').toString().compareTo((a.value['timestamp'] ?? '').toString()));
 
             // 2. Tính toán phân trang
             int totalItems = allLogs.length;

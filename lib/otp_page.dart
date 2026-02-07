@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:math'; // Cần thiết để sử dụng Random()
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
-
   @override
   State<OtpPage> createState() => _OtpPageState();
 }
@@ -30,8 +29,16 @@ class _OtpPageState extends State<OtpPage> {
           otpCode = data['current_otp']?.toString() ?? "------";
           int expiry = data['expiry_time'] ?? 0;
           int now = DateTime.now().millisecondsSinceEpoch;
-          _secondsRemaining = ((expiry - now) / 1000).round();
-          if (_secondsRemaining > 0) _startLocalTimer();
+          
+          // Chặn số âm
+          int diff = ((expiry - now) / 1000).round();
+          _secondsRemaining = diff > 0 ? diff : 0; 
+          
+          if (_secondsRemaining > 0) {
+            _startLocalTimer();
+          } else {
+            otpCode = "EXPIRED";
+          }
         });
       }
     });
@@ -43,6 +50,7 @@ class _OtpPageState extends State<OtpPage> {
       if (mounted && _secondsRemaining > 0) {
         setState(() => _secondsRemaining--);
       } else {
+        setState(() => otpCode = "EXPIRED");
         timer.cancel();
       }
     });
@@ -50,14 +58,8 @@ class _OtpPageState extends State<OtpPage> {
 
   void generateOTP() {
     String newCode = (Random().nextInt(900000) + 100000).toString();
-    // Hiệu lực 2 tiếng (7200 giây) theo yêu cầu mới
-    int expiryTime = DateTime.now().millisecondsSinceEpoch + 7200000;
-
-    _dbRef.update({
-      "current_otp": newCode,
-      "expiry_time": expiryTime,
-      "otp_used": false,
-    });
+    int expiryTime = DateTime.now().millisecondsSinceEpoch + 7200000; // 2 Tiếng
+    _dbRef.update({"current_otp": newCode, "expiry_time": expiryTime, "otp_used": false});
   }
 
   @override
@@ -68,11 +70,15 @@ class _OtpPageState extends State<OtpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.security, size: 80, color: Colors.blue),
+            Icon(Icons.security, size: 80, color: _secondsRemaining > 0 ? Colors.blue : Colors.red),
             const SizedBox(height: 20),
-            Text(otpCode, style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
+            Text(otpCode, style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: _secondsRemaining > 0 ? Colors.black : Colors.red)),
             const SizedBox(height: 20),
-            Text("Còn hiệu lực: ${_secondsRemaining ~/ 60} phút"),
+            // Hiển thị trạng thái thay vì số âm
+            Text(
+              _secondsRemaining > 0 ? "Còn hiệu lực: ${_secondsRemaining ~/ 60} phút" : "Mã đã hết hiệu lực",
+              style: TextStyle(color: _secondsRemaining > 0 ? Colors.black : Colors.red, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 40),
             ElevatedButton(onPressed: generateOTP, child: const Text("TẠO MÃ MỚI")),
           ],
@@ -80,10 +86,7 @@ class _OtpPageState extends State<OtpPage> {
       ),
     );
   }
-
+  
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  void dispose() { _timer?.cancel(); super.dispose(); }
 }
