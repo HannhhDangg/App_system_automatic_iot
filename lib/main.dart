@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; 
 import 'home_page.dart';
-import 'otp_page.dart'; // File mới
-import 'package:firebase_core/firebase_core.dart'; // Thêm dòng này
-import 'firebase_options.dart'; // Thêm dòng này
+import 'otp_page.dart'; 
 import 'history_page.dart';
 import 'member_page.dart';
-import 'otp_page.dart';
-import 'history_page.dart';
 
 void main() async {
-  // Đảm bảo các dịch vụ hệ thống được khởi tạo
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Khởi tạo Firebase với dự án SmartHomeDoorLock
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
   runApp(const SmartLockApp());
 }
 
@@ -27,7 +21,11 @@ class SmartLockApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFF0F0F1A),
+      ),
       home: const MainScreen(),
     );
   }
@@ -44,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final List<Widget> _pages = [
     const HomePage(),
-    const OtpPage(), // Thêm trang OTP vào đây
+    const OtpPage(),
     const HistoryPage(),
     const MemberPage(),
   ];
@@ -52,14 +50,20 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: IndexedStack( // Dùng IndexedStack để giữ trạng thái trang
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed, // Giúp hiển thị tốt khi có 4 icon
+        type: BottomNavigationBarType.fixed, 
+        backgroundColor: const Color(0xFF161625),
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.white54,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.lock_open), label: 'Khóa'),
-          BottomNavigationBarItem(icon: Icon(Icons.vibration), label: 'Mã OTP'),
+          BottomNavigationBarItem(icon: Icon(Icons.vibration), label: 'OTP'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Lịch sử'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Thành viên'),
         ],
